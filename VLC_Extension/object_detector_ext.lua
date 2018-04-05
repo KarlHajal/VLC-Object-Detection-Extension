@@ -36,7 +36,18 @@ function create_dialog()
 end
 
 function click_START()
+    local item = vlc.input.item()
+    local video_file_directory = item:uri()
+    video_file_directory = string.gsub(uri, '^file:///', '')
+    video_file_directory = string.gsub(uri, '/', '\\')
+    -- cmd = 'python'..object_detection_script_directory.." "video_file_directory.." "..object_name:get_text()
+    -- Add visual representation that the script is being executed
+    -- os.execute(cmd)
+    -- remove visual representation
+    -- read output file
+    -- send read data to method that displays list of frames containing objects
 end
 
 function click_STOP()
+    -- os.exit()
 end
