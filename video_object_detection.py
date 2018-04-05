@@ -114,7 +114,7 @@ success = True
 frames_with_object_range = []
 while success:
     success,image = video.read()
-    print ('Read a new frame: ', success)
+    print ("Reading frame " + str(frame_count+1) + ": ", success)
     if success:
         img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -127,3 +127,9 @@ while success:
             if frame_count == last_frame+1:
                 frames_with_object_range.append((first_frame, last_frame))
     frame_count += 1
+f = open('./object_detection_output.txt', 'w+')
+for r in frames_with_object_range:
+    f.write(r[0] + ", " + r[1] + "\n")
+f.close()
+
+
