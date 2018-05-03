@@ -17,6 +17,7 @@ PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
 PATH_TO_LABELS = os.path.join('object_detection', 'data', 'mscoco_label_map.pbtxt')
 NUM_CLASSES = 90
 
+#Model is downloaded if it isn't found
 if(not os.path.exists(MODEL_NAME)):
     print("Downloading " + MODEL_NAME)
     opener = urllib.request.URLopener()
@@ -33,6 +34,7 @@ label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
+# Detect recognizable objects in a frame
 def detect_alert (boxes, classes, scores, category_index, max_boxes_to_draw=20, min_score_thresh=.5,):
     r = []
     for i in range(min(max_boxes_to_draw, boxes.shape[0])):
@@ -49,6 +51,7 @@ def detect_alert (boxes, classes, scores, category_index, max_boxes_to_draw=20, 
             r.append(line)
 
     return r
+
 
 def detect_objects(image_np, sess, detection_graph):
     image_np_expanded = np.expand_dims(image_np, axis=0)
@@ -94,6 +97,11 @@ def process_image(image, object_name, min_confidence):
 
             return False
 
+
+if(len(sys.argv) < 5):
+    print("Wrong number of arguments")
+    sys.exit()
+
 object_name = str(sys.argv[2])
 object_is_valid = False
 for category in category_index:
@@ -104,32 +112,40 @@ if(not object_is_valid):
     print("Invalid object specified")
     sys.exit()
 
+start_time_in_seconds = int(sys.argv[3])
+if(start_time_in_seconds < 0):
+    print("Invalid frame number specified")
+    sys.exit()
+
+previous_frame_contained_object = int(sys.argv[4]) > 0
+
 video_file_name = str(sys.argv[1])
 video = cv2.VideoCapture(video_file_name)
 success, image = video.read()
-frame_count = 0
-last_frame = -2
-first_frame = -1
+
+start_frame_number = int(video.get(cv2.CAP_PROP_FPS)+0.5) * start_time_in_seconds
+video.set(cv2.CAP_PROP_POS_FRAMES, start_frame_number)
+
+frame_count = start_frame_number
+last_frame = frame_count - 2 + previous_frame_contained_object
+first_frame = frame_count - 1
 success = True
-frames_with_object_range = []
 while success:
     success,image = video.read()
-    print ("Reading frame " + str(frame_count+1) + ": ", success)
+    print ("Reading frame " + str(frame_count) + ": ", success)
     if success:
         img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        if process_image(img, object_name, 87):
+        if process_image(img, object_name, 70):
             if frame_count > last_frame+1:
                 print("Found " + object_name + " at frame " + str(frame_count))
-                first_frame = frame_count
+                cv2.imwrite("frame%d.jpg" % frame_count, image) # Save frame as JPEG file
+
+                f = open('./object_detection_output.txt', 'w+')
+                f.write(str(frame_count) + "\n")
+                f.close()
+
+                #cv2.imwrite("frame.jpg", image) # Save frame as JPEG file
+                sys.exit()
             last_frame = frame_count
-        else:
-            if frame_count == last_frame+1:
-                frames_with_object_range.append((first_frame, last_frame))
     frame_count += 1
-f = open('./object_detection_output.txt', 'w+')
-for r in frames_with_object_range:
-    f.write(r[0] + ", " + r[1] + "\n")
-f.close()
-
-
