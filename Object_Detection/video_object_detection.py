@@ -5,10 +5,12 @@ import numpy as np
 import tensorflow as tf
 import urllib
 import tarfile
+import datetime
 
 #sys.path.append("..")
 
 from object_detection.utils import label_map_util
+from object_detection.utils import visualization_utils as vis_util
 
 MODEL_NAME = 'ssd_mobilenet_v1_coco_11_06_2017'
 MODEL_FILE = MODEL_NAME + '.tar.gz'
@@ -67,7 +69,7 @@ def detect_objects(image_np, sess, detection_graph):
 
     alert_array = detect_alert(np.squeeze(boxes), np.squeeze(classes).astype(np.int32), np.squeeze(scores), category_index)
 
-    return alert_array
+    return alert_array, boxes, scores, classes
 
 IMAGE_SIZE = (12, 8)
 
@@ -87,12 +89,15 @@ with detection_graph.as_default():
 def process_image(image, object_name, min_confidence):
     with detection_graph.as_default():
         with tf.Session(graph=detection_graph) as sess:
-            alert_array = detect_objects(image, sess, detection_graph)
+            alert_array, boxes, scores, classes = detect_objects(image, sess, detection_graph)
 
             for alert in alert_array:
                 print(alert)
                 if object_name in alert:
                     if alert[object_name] > min_confidence:
+                        vis_util.visualize_boxes_and_labels_on_image_array( image, np.squeeze(boxes), np.squeeze(classes).astype(np.int32), np.squeeze(scores), category_index, use_normalized_coordinates=True, line_thickness=8)
+                        #cv2.imshow('object detection', image)
+                        #cv2.imwrite("frame.jpg", image)
                         return True
 
             return False
@@ -123,7 +128,8 @@ video_file_name = str(sys.argv[1])
 video = cv2.VideoCapture(video_file_name)
 success, image = video.read()
 
-start_frame_number = int(video.get(cv2.CAP_PROP_FPS)+0.5) * start_time_in_seconds
+fps = int(video.get(cv2.CAP_PROP_FPS)+0.5)
+start_frame_number = fps * start_time_in_seconds
 video.set(cv2.CAP_PROP_POS_FRAMES, start_frame_number)
 
 frame_count = start_frame_number
@@ -134,15 +140,16 @@ while success:
     success,image = video.read()
     print ("Reading frame " + str(frame_count) + ": ", success)
     if success:
-        img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        #img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        if process_image(img, object_name, 70):
+        if process_image(image, object_name, 50):
             if frame_count > last_frame+1:
                 print("Found " + object_name + " at frame " + str(frame_count))
                 cv2.imwrite("frame%d.jpg" % frame_count, image) # Save frame as JPEG file
 
                 f = open('./object_detection_output.txt', 'w+')
                 f.write(str(frame_count) + "\n")
+                f.write(str(datetime.timedelta(seconds=(frame_count/fps))) + "\n")
                 f.close()
 
                 #cv2.imwrite("frame.jpg", image) # Save frame as JPEG file
