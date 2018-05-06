@@ -1,5 +1,4 @@
  # VLC Object Detection Extension
- Inline-style:
 ![alt text](https://github.com/KarlHajal/VLC-Object-Detection-Add-On/raw/master/object_detector_data/logo.png "Logo")
  ### Description
  ***
@@ -19,11 +18,11 @@
 ![alt text](https://github.com/KarlHajal/VLC-Object-Detection-Add-On/raw/master/screenshots/initial_state.png "Initial State")
 
 #### Objects Found
-When a the first frame containing the object is found, it is displayed to the user along with the time at which it was found, and the ability to jump to the corresponding frame within the video file.
+When the first frame containing the object is found, it is displayed to the user along with the time at which it was found, and the ability to jump to the corresponding frame within the video file.
 ![alt text](https://github.com/KarlHajal/VLC-Object-Detection-Add-On/raw/master/screenshots/object_found_1.png "Object Found 1")
 
 ![alt text](https://github.com/KarlHajal/VLC-Object-Detection-Add-On/raw/master/screenshots/object_found_2.png "Object Found 2")
 
 #### Error Message Displayed
-In case no object was found or there was an issue with the user input, an message is diplayed informing the user of what went wrong.
+In case the specified object wasn't found or there was an issue with the user input, a message is diplayed informing the user of what went wrong.
 ![alt text](https://github.com/KarlHajal/VLC-Object-Detection-Add-On/raw/master/screenshots/error_message.png "Error Message")
