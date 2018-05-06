@@ -95,7 +95,7 @@ def process_image(image, object_name, min_confidence):
                 print(alert)
                 if object_name in alert:
                     if alert[object_name] > min_confidence:
-                        vis_util.visualize_boxes_and_labels_on_image_array( image, np.squeeze(boxes), np.squeeze(classes).astype(np.int32), np.squeeze(scores), category_index, use_normalized_coordinates=True, line_thickness=8)
+                        vis_util.visualize_boxes_and_labels_on_image_array( image, np.squeeze(boxes), np.squeeze(classes).astype(np.int32), np.squeeze(scores), category_index, use_normalized_coordinates=True, line_thickness=4)
                         #cv2.imshow('object detection', image)
                         #cv2.imwrite("frame.jpg", image)
                         return True
@@ -103,8 +103,12 @@ def process_image(image, object_name, min_confidence):
             return False
 
 
+
 if(len(sys.argv) < 5):
     print("Wrong number of arguments")
+    f = open('./object_detection_output.txt', 'w+')
+    f.write("Wrong number of arguments \n")
+    f.close()
     sys.exit()
 
 object_name = str(sys.argv[2])
@@ -115,11 +119,17 @@ for category in category_index:
         break
 if(not object_is_valid):
     print("Invalid object specified")
+    f = open('./object_detection_output.txt', 'w+')
+    f.write("Invalid object specified \n")
+    f.close()
     sys.exit()
 
 start_time_in_seconds = int(sys.argv[3])
 if(start_time_in_seconds < 0):
     print("Invalid frame number specified")
+    f = open('./object_detection_output.txt', 'w+')
+    f.write("Invalid timestamp specified \n")
+    f.close()
     sys.exit()
 
 previous_frame_contained_object = int(sys.argv[4]) > 0
@@ -155,4 +165,13 @@ while success:
                 #cv2.imwrite("frame.jpg", image) # Save frame as JPEG file
                 sys.exit()
             last_frame = frame_count
+    else:
+        f = open('./object_detection_output.txt', 'w+')
+        f.write("Invalid frame number specified \n")
+        f.close()
     frame_count += 1
+
+# Object was not found
+f = open('./object_detection_output.txt', 'w+')
+f.write("No Result \n")
+f.close()
