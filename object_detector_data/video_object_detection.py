@@ -12,7 +12,7 @@ import datetime
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
-USER = "karl"
+USER = os.environ['USER']
 LOCAL_DIR = "/home/"+USER+"/.local/share/vlc/lua/extensions/object_detector_data/"
 MODEL_NAME = 'ssd_mobilenet_v1_coco_11_06_2017'
 MODEL_DIR = os.path.join(LOCAL_DIR, MODEL_NAME)
