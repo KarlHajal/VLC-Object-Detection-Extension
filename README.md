@@ -1,5 +1,5 @@
  # VLC Object Detection Extension
-![alt text](https://github.com/KarlHajal/VLC-Object-Detection-Add-On/raw/master/object_detector_data/logo.png "Logo")
+![alt text](https://github.com/KarlHajal/VLC-Object-Detection-Add-On/raw/master/extension/object_detector_data/logo.png "Logo")
  ### Description
  ***
  VLC extension that allows users to search for frames containing a certain object. 
