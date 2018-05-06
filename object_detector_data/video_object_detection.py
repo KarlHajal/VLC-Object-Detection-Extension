@@ -12,19 +12,22 @@ import datetime
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
+USER = "karl"
+LOCAL_DIR = "/home/"+USER+"/.local/share/vlc/lua/extensions/object_detector_data/"
 MODEL_NAME = 'ssd_mobilenet_v1_coco_11_06_2017'
+MODEL_DIR = os.path.join(LOCAL_DIR, MODEL_NAME)
 MODEL_FILE = MODEL_NAME + '.tar.gz'
 DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
-PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
-PATH_TO_LABELS = os.path.join('object_detection', 'data', 'mscoco_label_map.pbtxt')
+PATH_TO_CKPT = MODEL_DIR + '/frozen_inference_graph.pb'
+PATH_TO_LABELS = os.path.join(LOCAL_DIR, 'object_detection', 'data', 'mscoco_label_map.pbtxt')
 NUM_CLASSES = 90
 
 #Model is downloaded if it isn't found
-if(not os.path.exists(MODEL_NAME)):
+if(not os.path.exists(MODEL_DIR)):
     print("Downloading " + MODEL_NAME)
     opener = urllib.request.URLopener()
-    opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
-    tar_file = tarfile.open(MODEL_FILE)
+    opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, LOCAL_DIR + MODEL_FILE)
+    tar_file = tarfile.open(LOCAL_DIR + MODEL_FILE)
     for file in tar_file.getmembers():
         file_name = os.path.basename(file.name)
         if 'frozen_inference_graph.pb' in file_name:
@@ -106,7 +109,7 @@ def process_image(image, object_name, min_confidence):
 
 if(len(sys.argv) < 5):
     print("Wrong number of arguments")
-    f = open('./object_detection_output.txt', 'w+')
+    f = open(LOCAL_DIR + 'object_detection_output.txt', 'w+')
     f.write("Wrong number of arguments \n")
     f.close()
     sys.exit()
@@ -119,7 +122,7 @@ for category in category_index:
         break
 if(not object_is_valid):
     print("Invalid object specified")
-    f = open('./object_detection_output.txt', 'w+')
+    f = open(LOCAL_DIR + 'object_detection_output.txt', 'w+')
     f.write("Invalid object specified \n")
     f.close()
     sys.exit()
@@ -127,7 +130,7 @@ if(not object_is_valid):
 start_time_in_seconds = int(sys.argv[3])
 if(start_time_in_seconds < 0):
     print("Invalid frame number specified")
-    f = open('./object_detection_output.txt', 'w+')
+    f = open(LOCAL_DIR + 'object_detection_output.txt', 'w+')
     f.write("Invalid timestamp specified \n")
     f.close()
     sys.exit()
@@ -155,9 +158,9 @@ while success:
         if process_image(image, object_name, 50):
             if frame_count > last_frame+1:
                 print("Found " + object_name + " at frame " + str(frame_count))
-                cv2.imwrite("frame%d.jpg" % frame_count, image) # Save frame as JPEG file
+                cv2.imwrite(LOCAL_DIR + "frame%d.jpg" % frame_count, image) # Save frame as JPEG file
 
-                f = open('./object_detection_output.txt', 'w+')
+                f = open(LOCAL_DIR + 'object_detection_output.txt', 'w+')
                 f.write(str(frame_count) + "\n")
                 f.write(str(datetime.timedelta(seconds=(frame_count/fps))) + "\n")
                 f.close()
@@ -166,12 +169,12 @@ while success:
                 sys.exit()
             last_frame = frame_count
     else:
-        f = open('./object_detection_output.txt', 'w+')
+        f = open(LOCAL_DIR + 'object_detection_output.txt', 'w+')
         f.write("Invalid frame number specified \n")
         f.close()
     frame_count += 1
 
 # Object was not found
-f = open('./object_detection_output.txt', 'w+')
+f = open(LOCAL_DIR + 'object_detection_output.txt', 'w+')
 f.write("No Result \n")
 f.close()
