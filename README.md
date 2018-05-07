@@ -12,6 +12,10 @@
 3. The extension should be accessible from VLC at this point. The first time the script is executed, the COCO model will be downloaded, completing the installation. 
 I would suggest running VLC from a terminal so that what is happening becomes apparent through output messages.
 
+### Issues
+***
+Searching for an object can be a very lengthy operation. As a result VLC might prompt that the process is not responding and offer to kill it. Again, I would suggest running VLC from a terminal to be able to see that the search is indeed ongoing.
+
 ### Screenshots
 ***
 
